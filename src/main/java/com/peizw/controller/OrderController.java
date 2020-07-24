@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.peizw.entities.Order;
 import com.peizw.entities.ResultMessage;
 import com.peizw.service.OrderService;
+import com.sun.xml.bind.v2.TODO;
 
 @Controller
 public class OrderController {
@@ -25,14 +26,22 @@ public class OrderController {
 		// 把JSON字符串转换成对象数组
 		List<Order> orders = JSONArray.parseArray(orderlist, Order.class);
 		for (Order order : orders) {
+			//添加订单前查询数据库验证待添加的订单是否已存在
 			Order orderobj = new Order();
-			orderobj.setOrderNum(order.getOrderNum());
-			orderobj.setProductId(order.getProductId());
-			orderobj.setProductName(order.getProductName());
-			orderobj.setProductPrice(order.getProductPrice());
-			orderobj.setProductStock(order.getProductStock());
-			orderobj.setShopName(order.getShopName());
-			orderService.addorderlist(orderobj);
+			Integer ordernum = orderService.checkorderexist(order.getProductId());
+			if(ordernum == 0) {
+				orderobj.setOrderNum(order.getOrderNum());
+				orderobj.setProductId(order.getProductId());
+				orderobj.setProductName(order.getProductName());
+				orderobj.setProductPrice(order.getProductPrice());
+				orderobj.setProductStock(order.getProductStock());
+				orderobj.setShopName(order.getShopName());
+				orderService.addorderlist(orderobj);
+			}else {
+				//订单已存在，只添加订单数
+				orderService.addordernum(order.getOrderNum(),order.getProductId());
+			}
+			
 		}
 		ResultMessage rs = new ResultMessage();
 		rs.setFlag(true);
@@ -48,13 +57,20 @@ public class OrderController {
 		List<Order> orders = JSONArray.parseArray(orderlist, Order.class);
 		for (Order order : orders) {
 			Order orderobj = new Order();
-			orderobj.setOrderNum(order.getOrderNum());
-			orderobj.setProductId(order.getProductId());
-			orderobj.setProductName(order.getProductName());
-			orderobj.setProductPrice(order.getProductPrice());
-			orderobj.setProductStock(order.getProductStock());
-			orderobj.setShopName(order.getShopName());
-			orderService.addorderlist(orderobj);
+			Integer ordernum = orderService.checkorderexist(order.getProductId());
+			if(ordernum == 0) {
+				orderobj.setOrderNum(order.getOrderNum());
+				orderobj.setProductId(order.getProductId());
+				orderobj.setProductName(order.getProductName());
+				orderobj.setProductPrice(order.getProductPrice());
+				orderobj.setProductStock(order.getProductStock());
+				orderobj.setShopName(order.getShopName());
+				orderService.addorderlist(orderobj);
+			}else {
+				//订单已存在，只添加订单数
+				orderService.addordernum(order.getOrderNum(),order.getProductId());
+			}
+			
 		}
 		ResultMessage rs = new ResultMessage();
 		rs.setFlag(true);

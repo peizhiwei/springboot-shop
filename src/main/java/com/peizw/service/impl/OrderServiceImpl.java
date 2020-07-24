@@ -16,7 +16,24 @@ import com.peizw.service.OrderService;
 public class OrderServiceImpl implements OrderService {
 	@Autowired
 	private OrderRepository orderRepository;
-
+	/**
+	 * 添加订单前，查询数据库验证待添加的订单是否已存在
+	 */
+	@Override
+	public Integer checkorderexist(Integer productId) {
+		Integer ordernum = orderRepository.checkorderexist(productId);
+		return ordernum;
+	}
+	/**
+	 * 添加订单时，如果数据库中已存在该订单，则只添加订单数
+	 */
+	@Override
+	public void addordernum(Integer orderNum ,Integer productId) {
+		orderRepository.addordernum(orderNum,productId);
+	}
+	/**
+	 * 添加订单
+	 */
 	@Override
 	public void addorderlist(Order order) {
 		orderRepository.addorderlist(order);
@@ -43,5 +60,6 @@ public class OrderServiceImpl implements OrderService {
 	public void updataproductstock(Integer productId) {
 		orderRepository.updataproductstock(productId);
 	}
+	
 
 }
