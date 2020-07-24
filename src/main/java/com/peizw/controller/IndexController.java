@@ -25,7 +25,7 @@ public class IndexController {
     }
     @RequestMapping("/index1")
     public String reindex1() {
-    	message = "ありがどございます！";
+    	message = "ありがとうございました！ ";
     	return "index";
     }
     @RequestMapping("/index2")
