@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>computer</title>
+<link rel="stylesheet" href="/css/bootstrap.min.css" />
+<script type="text/javascript" src="/js/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="/js/vue.min.js"></script>
+</head>
+<body>
+	<div id="app" class="container">
+		<div>
+			<h2>＜＜パソコン注文＞＞</h2>
+			<table class="table table-bordered table-striped text-center" style="font-size: 18px;">
+				<tr>
+					<th class="text-center">営業店名</th>
+					<th class="text-center">製品名</th>
+					<th class="text-center">単価</th>
+					<th class="text-center">在庫数</th>
+					<th class="text-center">注文数</th>
+				</tr>
+				<tr v-for="item in computerlist">
+					<td>{{item.shop.shopName}}</td>
+					<td>{{item.productName}}</td>
+					<td>￥{{item.productPrice}}</td>
+					<td>{{item.productStock}}</td>
+					<td><input :id="item.productId" value="0" type="number" /></td>
+				</tr>
+			</table>
+			<div>
+				<form class="form-inline">
+					<div class="form-group">
+						<label class="control-label" style="font-size: 18px;">次处理=>&nbsp;&nbsp;&nbsp;1:注文确定 &nbsp; 2：注文中断</label>
+						<input type="text" class="form-control" id="selectdispose" value="1">
+					</div>
+					<button type="button" class="btn btn-default" @click="sureorder()">送信</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+	var app = new Vue({
+		el:'#app',
+		data:{
+			computerlist:[],
+			orderarray:[],
+		},
+		mounted:function(){
+			this.get();
+		},
+		methods:{
+			get : function(){
+				$.ajax({
+					url : '/getcomputerlist',
+					type : 'GET',
+					dataType : 'JSON',
+					success : function(result) {
+						app.computerlist = result;
+					},
+					error : function() {
+						console.log("请求失败处理");
+					}
+				});
+			},
+			sureorder : function(){
+				if($("#selectdispose").val()==1){
+					for(var i=0;i<this.computerlist.length;i++){
+						if($("#"+this.computerlist[i].productId).val()!=0){
+							var order = {};
+							order.productId=this.computerlist[i].productId;
+							order.shopName=this.computerlist[i].shop.shopName;
+							order.productName=this.computerlist[i].productName;
+							order.productPrice = this.computerlist[i].productPrice;
+							order.productStock = this.computerlist[i].productStock;
+							order.ordernum=$("#"+app.computerlist[i].productId).val();
+							this.orderarray.push(order);
+						}
+					}
+					var orderlist = this.orderarray
+					$.ajax({
+						url : '/addcomputerorderlist',
+						type : 'POST',
+						dataType : 'JSON',
+						data: {"orderlist":JSON.stringify(orderlist)},
+						success : function(result) {
+							window.location.href=result.message;
+						},
+						error : function() {
+							console.log("请求失败处理");
+						}
+					});
+				}else{
+					window.location.href="/index2";
+				}
+				
+			}
+		}
+	});
+	</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>memorizer</title>
+<link rel="stylesheet" href="/css/bootstrap.min.css" />
+<script type="text/javascript" src="/js/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="/js/vue.min.js"></script>
+</head>
+<body>
+	<div id="app" class="container">
+		<div>
+			<h2>＜＜メモリ注文＞＞</h2>
+			<table class="table table-bordered table-striped text-center" style="font-size: 18px;">
+				<tr>
+					<th class="text-center">営業店名</th>
+					<th class="text-center">製品名</th>
+					<th class="text-center">単価</th>
+					<th class="text-center">在庫数</th>
+					<th class="text-center">注文数</th>
+				</tr>
+				<tr v-for="item in memorizerlist">
+					<td>{{item.shop.shopName}}</td>
+					<td>{{item.productName}}</td>
+					<td>￥{{item.productPrice}}</td>
+					<td>{{item.productStock}}</td>
+					<td><input :id="item.productId" value="0" type="number" /></td>
+				</tr>
+			</table>
+			<div>
+				<form class="form-inline">
+					<div class="form-group">
+						<label class="control-label" style="font-size: 18px;">次处理=>&nbsp;&nbsp;&nbsp;1:注文确定 &nbsp; 2：注文中断</label>
+						<input type="text" class="form-control" id="selectdispose" value="1">
+					</div>
+					<button type="button" class="btn btn-default" @click="sureorder()">送信</button>
+				</form>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+	var app = new Vue({
+		el:'#app',
+		data:{
+			memorizerlist:[],
+			orderarray:[],
+		},
+		mounted:function(){
+			this.get();
+		},
+		methods:{
+			get : function(){
+				$.ajax({
+					url : '/getmemorizerlist',
+					type : 'GET',
+					dataType : 'JSON',
+					success : function(result) {
+						app.memorizerlist = result;
+					},
+					error : function() {
+						console.log("请求失败处理");
+					}
+				});
+			},
+			sureorder : function(){
+				if($("#selectdispose").val()==1){
+					for(var i=0;i<this.memorizerlist.length;i++){
+						if($("#"+this.memorizerlist[i].productId).val()!=0){
+							var order = {};
+							order.productId=this.memorizerlist[i].productId;
+							order.shopName=this.memorizerlist[i].shop.shopName;
+							order.productName=this.memorizerlist[i].productName;
+							order.productPrice = this.memorizerlist[i].productPrice;
+							order.productStock = this.memorizerlist[i].productStock;
+							order.ordernum=$("#"+app.memorizerlist[i].productId).val();
+							this.orderarray.push(order);
+						}
+					}
+					var orderlist = this.orderarray
+					$.ajax({
+						url : '/addmemorizerorderlist',
+						type : 'POST',
+						dataType : 'JSON',
+						data: {"orderlist":JSON.stringify(orderlist)},
+						success : function(result) {
+							window.location.href=result.message;
+						},
+						error : function() {
+							console.log("请求失败处理");
+						}
+					});
+				}else{
+					//清除订单信息
+					$.ajax({
+						url : '/cleanorderlist',
+						type : 'POST',
+						error : function() {
+							console.log("请求失败处理");
+						}
+					});
+					window.location.href="/index2";
+				}
+				
+			}
+		}
+	});
+	</script>
+</body>
+</html>
