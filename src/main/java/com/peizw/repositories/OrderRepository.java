@@ -52,7 +52,7 @@ public interface OrderRepository extends CrudRepository<Order, Integer>,JpaRepos
 	@Query(value = "delete from `order`",nativeQuery = true)
 	public void cleanorderlist();
 	/**
-	 * 提交订单后减去产品库存
+	 * 提交订单后更新产品库存
 	 */
 	@Transactional
 	@Modifying

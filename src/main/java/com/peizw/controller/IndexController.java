@@ -2,43 +2,35 @@ package com.peizw.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.peizw.entities.ResultMessage;
 import com.peizw.entities.Shop;
 import com.peizw.service.ShopService;
 
 @Controller
 public class IndexController {
-	private String message = null;
-	
 	@Autowired
 	private ShopService shopService;
 	
     @RequestMapping("/")
     public String index() {
-    	message = null;
         return "index";
     }
     @RequestMapping("/index1")
-    public String reindex1() {
-    	message = "ありがとうございました！ ";
+    public String reindex1(Model model) {
+    	model.addAttribute("message", "ありがとうございました！");
     	return "index";
     }
     @RequestMapping("/index2")
-    public String reindex2() {
-    	message = "またおねがいします！";
+    public String reindex2(Model model) {
+    	model.addAttribute("message", "またおねがいします！");
     	return "index";
-    }
-    @RequestMapping("/getmessage")
-    @ResponseBody
-    public ResultMessage getmessage() {
-    	ResultMessage rs = new ResultMessage();
-    	rs.setMessage(message);
-    	return rs;
     }
     @RequestMapping("/computer")
     public String product1() {

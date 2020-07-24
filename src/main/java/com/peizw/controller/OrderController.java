@@ -98,17 +98,22 @@ public class OrderController {
 	public void cleanorderlist() {
 		orderService.cleanorderlist();
 	}
-	//跟新产品库存
+	//更新产品库存
 	@RequestMapping("/updateproductstock")
 	@ResponseBody
 	public ResultMessage updateproductstock(String productidarray) {
-		String[] proIdArr=productidarray.split(",");
-		for(String pId : proIdArr) {
-			orderService.updataproductstock(Integer.valueOf(pId));
-		}
 		ResultMessage rs = new ResultMessage();
-		rs.setFlag(true);
-		rs.setMessage("订单提交成功！");
+		if(productidarray=="") {
+			rs.setFlag(false);
+			rs.setMessage("订单不存在，提交失败");
+		}else {
+			String[] proIdArr=productidarray.split(",");
+			for(String pId : proIdArr) {
+				orderService.updataproductstock(Integer.valueOf(pId));
+			}
+			rs.setFlag(true);
+			rs.setMessage("订单提交成功！");
+		}
 		return rs;
 	}
 }
